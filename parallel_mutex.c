@@ -97,7 +97,7 @@ int main(int argc, char **argv)
 {
     long i;
     pthread_t *threads;
-    double start, end;
+    double start, end, global_start, global_end;
 
     if (argc != 2)
     {
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
     for (i = 0; i < NUM_BUCKETS; i++)
     {
         pthread_mutex_init(&lock[i], NULL);
-    }
+    } // insert thread initialized
 
     threads = (pthread_t *)malloc(sizeof(pthread_t) * num_threads);
     if (!threads)
@@ -125,6 +125,7 @@ int main(int argc, char **argv)
     }
 
     // Insert keys in parallel/
+    global_start = now();
     start = now();
     for (i = 0; i < num_threads; i++)
     {
@@ -147,6 +148,7 @@ int main(int argc, char **argv)
     start = now();
     for (i = 0; i < num_threads; i++)
     {
+
         pthread_create(&threads[i], NULL, get_phase, (void *)i);
     }
 
@@ -159,8 +161,10 @@ int main(int argc, char **argv)
         total_lost += lost_keys[i];
     }
     end = now();
+    global_end = now();
 
     printf("[main] Retrieved %ld/%d keys in %f seconds\n", NUM_KEYS - total_lost, NUM_KEYS, end - start);
+    printf("[main] time complete is %f seconds\n", global_end - global_start);
 
     return 0;
 }
